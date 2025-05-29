@@ -76,20 +76,68 @@
 </form>
 
         <table class="table table-striped" id="tabla-ofertas">
-            <thead>
-                <tr>
-                    <th>Artículo</th>
-                    <th>Variedad</th>
-                    <th>Cultivo</th>
-                    <th>Fecha</th>
-                    <th>Cajas</th>
-                    <th>Disponible</th>
-                    <th>Reservado</th>
-                </tr>
-            </thead>
+           <thead>
+  <tr>
+    <th>Artículo</th>
+    <th>Variedad</th>
+    <th>Cultivo</th>
+    <th>Fecha</th>
+    <th>Cajas</th>
+    <th>Disponible</th>
+    <th>Reservado</th>
+    <th>Acciones</th>
+  </tr>
+</thead>
+
             <tbody> <!--registros--> </tbody>
         </table>
     </div>
+<!--modales-->
+<div class="modal fade" id="modalEditarOferta" tabindex="-1" aria-labelledby="modalEditarOfertaLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditarOfertaLabel">Editar Oferta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditarOferta">
+          <input type="hidden" id="edit-id-oferta">
+          <div class="mb-3">
+            <label for="edit-articulo" class="form-label">Artículo</label>
+            <select class="form-select" id="edit-articulo">
+              <option value="Rosa">Rosa</option>
+              <option value="Clavel">Clavel</option>
+              <option value="Paniculata">Paniculata</option>
+              <option value="Alstromelia">Alstromelia</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="edit-variedad" class="form-label">Variedad</label>
+            <input type="text" class="form-control" id="edit-variedad">
+          </div>
+          <div class="mb-3">
+            <label for="edit-cultivo" class="form-label">Cultivo</label>
+            <input type="text" class="form-control" id="edit-cultivo">
+          </div>
+          <div class="mb-3">
+            <label for="edit-fecha" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="edit-fecha">
+          </div>
+          <div class="mb-3">
+            <label for="edit-cajas" class="form-label">Cajas</label>
+            <input type="number" step="0.5" min="0.5" class="form-control" id="edit-cajas">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary" form="formEditarOferta">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
