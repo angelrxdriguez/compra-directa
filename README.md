@@ -53,28 +53,3 @@ PHP (para lógica backend)
 MySQL (base de datos)
 
 Sesiones PHP para autenticación
-
-Estructura básica del proyecto
-bash
-Copiar
-Editar
-/
-├── index.html               # Login
-├── perfil.html              # Perfil del usuario
-├── comprador.html           # Vista comprador
-├── admin.html               # Vista administrador
-├── oferta.html              # Gestión de ofertas
-├── php/
-│   ├── log.php              # Login
-│   ├── logout.php           # Logout
-│   ├── obtener_usuarios.php # API usuarios
-│   ├── crear_usuario.php
-│   ├── actualizar_usuario.php
-│   ├── eliminar_usuario.php
-│   ├── obtener_ofertas.php  # API ofertas
-│   ├── crear_oferta.php
-│   ├── actualizar_oferta.php
-│   ├── eliminar_oferta.php
-├── style/
-│   └── style.css
-└── script.js                # JS principal (DOM + AJAX)
