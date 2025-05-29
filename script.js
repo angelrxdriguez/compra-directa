@@ -18,9 +18,9 @@ $(document).ready(function () {
         });
     });
     //cargar oferrtas
-    $.get("php/obtener_ofertas.php", function (data) {
-        data.forEach(function (oferta, index) {
-            $("#tabla-ofertas tbody").append(`
+$.get("php/obtener_ofertas.php", function (data) {
+  data.forEach(function (oferta) {
+    $("#tabla-ofertas tbody").append(`
       <tr>
         <td>${oferta.articulo}</td>
         <td>${oferta.variedad}</td>
@@ -31,7 +31,7 @@ $(document).ready(function () {
         <td>${oferta.reservado ?? '-'}</td>
         <td>
           <button class="btn btn-sm btn-primary btn-editar-oferta"
-            data-id="${oferta.id ?? index}" 
+            data-id="${oferta.id}" 
             data-articulo="${oferta.articulo}" 
             data-variedad="${oferta.variedad}" 
             data-cultivo="${oferta.cultivo}" 
@@ -39,13 +39,24 @@ $(document).ready(function () {
             data-cajas="${oferta.cajas}">
             Editar
           </button>
+          <button class="btn btn-sm btn-danger btn-eliminar-oferta"
+            data-id="${oferta.id}">
+            Eliminar
+          </button>
         </td>
       </tr>
     `);
-        });
-    });
-
+  });
 });
+
+// Mostrar modal de confirmación al hacer click en Eliminar
+$(document).on("click", ".btn-eliminar-oferta", function () {
+  const id = $(this).data("id");
+  $("#eliminar-id-oferta").val(id);
+  const modal = new bootstrap.Modal(document.getElementById("modalEliminarOferta"));
+  modal.show();
+});
+
 /*BOTONES y FORMS*/
 $(document).on("click", ".btn-editar", function () {
     const id = $(this).data("id");
@@ -164,6 +175,42 @@ $("#formEditarOferta").on("submit", function (e) {
         }
     }, "json");
 });
+// Eliminar oferta
+$("#confirmar-eliminar-oferta").on("click", function () {
+  const id = $("#eliminar-id-oferta").val();
 
+  $.post("php/eliminar_oferta.php", { id: id }, function (respuesta) {
+    if (respuesta.success) {
+      alert("Oferta eliminada correctamente.");
+      const modal = bootstrap.Modal.getInstance(document.getElementById("modalEliminarOferta"));
+      modal.hide();
+      location.reload();
+    } else {
+      alert("Error al eliminar: " + respuesta.error);
+    }
+  }, "json");
+});
+/*filtros de ofertas*/
+function filtrarTabla() {
+  const filtroArticulo = $("#filtro-articulo").val().toLowerCase();
+  const filtroVariedad = $("#filtro-variedad").val().toLowerCase();
+  const filtroCultivo = $("#filtro-cultivo").val().toLowerCase();
+
+  $("#tabla-ofertas tbody tr").each(function () {
+    const articulo = $(this).find("td:eq(0)").text().toLowerCase();
+    const variedad = $(this).find("td:eq(1)").text().toLowerCase();
+    const cultivo = $(this).find("td:eq(2)").text().toLowerCase();
+
+    const coincide = articulo.includes(filtroArticulo)
+                  && variedad.includes(filtroVariedad)
+                  && cultivo.includes(filtroCultivo);
+
+    $(this).toggle(coincide);
+  });
+}
+
+$("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", filtrarTabla);
+
+});
 
 

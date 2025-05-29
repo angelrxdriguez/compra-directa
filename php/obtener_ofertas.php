@@ -9,7 +9,7 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-$sql = "SELECT articulo, variedad, cultivo, fecha, cajas, disponible, reservado FROM ofertas ORDER BY fecha DESC";
+$sql = "SELECT id, articulo, variedad, cultivo, fecha, cajas, disponible, reservado FROM ofertas ORDER BY fecha DESC";
 $result = $conn->query($sql);
 
 $ofertas = [];

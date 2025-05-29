@@ -101,4 +101,11 @@ width: 350px;
   .menu-opcion.grande {
     grid-column: span 2;
   }
+  /*OFERTAS*/
+  .tabla-scrollable {
+  max-height: 700px;  
+  overflow-y: auto;
+  border: 2px solid #000000; 
+  border-radius: 10px;
+}
   /*Adm-usuarios*/
