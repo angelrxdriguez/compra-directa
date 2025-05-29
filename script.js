@@ -1,4 +1,13 @@
 $(document).ready(function () {
+     $.get("php/sesion.php", function (datos) {
+    if (!datos.error) {
+      $("#nombre-usuario").text(datos.nombre);
+      $("#tipo-usuario").text(`${datos.tipo} ${datos.division}`);
+    } else {
+      console.warn("No hay sesión activa");
+    }
+  }, "json");
+  
     $.get("php/obtener_usuarios.php", function (data) {
         data.forEach(function (usuario) {
             $("#tabla-usuarios tbody").append(`
@@ -208,9 +217,13 @@ function filtrarTabla() {
     $(this).toggle(coincide);
   });
 }
-
 $("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", filtrarTabla);
-
 });
+// Cerrar sesión
+  $(document).on("click", "#cerrar-sesion", function (e) {
+    e.preventDefault();
+    window.location.href = "php/logout.php";
+  });
+
 
 
