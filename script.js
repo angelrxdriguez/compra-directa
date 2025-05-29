@@ -17,7 +17,23 @@ $(document).ready(function () {
       `);
     });
   });
-  
+//cargar oferrtas
+  $.get("php/obtener_ofertas.php", function (data) {
+  data.forEach(function (oferta) {
+    $("#tabla-ofertas tbody").append(`
+      <tr>
+        <td>${oferta.articulo}</td>
+        <td>${oferta.variedad}</td>
+        <td>${oferta.cultivo}</td>
+        <td>${oferta.fecha}</td>
+        <td>${oferta.cajas}</td>
+        <td>${oferta.disponible ?? '-'}</td>
+        <td>${oferta.reservado ?? '-'}</td>
+      </tr>
+    `);
+  });
+});
+
 });
 /*BOTONES y FORMS*/ 
 $(document).on("click", ".btn-editar", function () {
@@ -47,10 +63,51 @@ $(document).on("click", ".btn-editar", function () {
     $.post("php/actualizar_usuario.php", datos, function (respuesta) {
       if (respuesta.success) {
         alert("Usuario actualizado correctamente.");
-        location.reload(); // Recargar tabla
+        location.reload(); 
       } else {
         alert("Error al actualizar: " + respuesta.error);
       }
     }, "json");
   });
+   $("#formCrear").on("submit", function (e) {
+    e.preventDefault();
+
+    const datos = {
+      nombre: $("#crear-nombre").val(),
+      pass: $("#crear-pass").val(),
+      tipo: $("#crear-tipo").val(),
+      division: $("#crear-division").val()
+    };
+
+    $.post("php/crear_usuario.php", datos, function (respuesta) {
+      if (respuesta.success) {
+        alert("Usuario creado correctamente.");
+        $("#modalCrear").modal("hide");
+        location.reload();
+      } else {
+        alert("Error: " + respuesta.error);
+      }
+    }, "json");
+  });
+$("#form-oferta").on("submit", function (e) {
+  e.preventDefault();
+
+  const datos = {
+    articulo: $("#articulo").val(),
+    variedad: $("#variedad").val(),
+    cultivo: $("#cultivo").val(),
+    fecha: $("#fecha").val(),
+    cajas: $("#cajas").val()
+  };
+
+  $.post("php/crear_oferta.php", datos, function (respuesta) {
+    if (respuesta.success) {
+      alert("Oferta registrada correctamente.");
+      location.reload();
+    } else {
+      alert("Error al guardar: " + respuesta.error);
+    }
+  }, "json");
+});
+
 

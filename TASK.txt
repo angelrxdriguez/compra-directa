@@ -1,1 +1,2 @@
 -Dar formato tabla usuarios
+-Auto completado de lineas
