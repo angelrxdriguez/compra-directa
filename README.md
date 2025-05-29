@@ -1,55 +1,51 @@
-Veraleza - Plataforma de Gestión de Ofertas
-Aplicación web interna para gestionar ofertas, usuarios y adjudicaciones para distintos roles (comprador, comercial, administrador, etc.).
+# Veraleza - Plataforma de Gestión de Ofertas
 
-Funcionalidades actuales
-Autenticación
-Inicio de sesión con validación de credenciales.
+Aplicación web interna para la gestión de usuarios y ofertas, diseñada para diferentes roles dentro de la organización.
 
-Uso de sesiones para mantener al usuario autenticado.
+---
 
-Redirección automática según el tipo de usuario.
+## Funcionalidades Actuales
 
-Perfil
-Vista de perfil con nombre, tipo y división del usuario autenticado.
+### 🔐 Autenticación
+- Inicio de sesión con verificación de usuario y contraseña.
+- Manejo de sesiones PHP.
+- Redirección automática al panel correspondiente según el tipo de usuario (`administrador`, `comprador`, `comercial`, `almacen`).
 
-Opción para cerrar sesión desde la sección de perfil.
+### 👤 Perfil
+- Visualización del perfil con:
+  - Nombre
+  - Tipo de usuario
+  - División
+- Botón de cierre de sesión (logout) con redirección al login.
 
-Gestión de Usuarios (vista administrador)
-Listado dinámico de usuarios.
+### 👥 Gestión de Usuarios
+- Listado dinámico de usuarios.
+- Añadir nuevos usuarios mediante formulario modal.
+- Edición de usuarios con datos precargados en modal.
+- Eliminación con confirmación por modal.
 
-Añadir nuevo usuario mediante modal.
+### 📦 Gestión de Ofertas
+- Creación de ofertas desde formulario.
+- Tabla con scroll vertical independiente.
+- Edición de ofertas en modal.
+- Eliminación de ofertas con confirmación.
+- Filtros dinámicos por:
+  - Artículo
+  - Variedad
+  - Cultivo
+- Filtros con inputs que incluyen icono de lupa.
 
-Editar usuario mediante modal.
+---
 
-Eliminación de usuario con confirmación.
+## Tecnologías Utilizadas
 
-Gestión de Ofertas
-Formulario para crear nuevas ofertas.
+- HTML5 + CSS3
+- JavaScript (jQuery)
+- Bootstrap 5
+- PHP
+- MySQL
 
-Tabla con scroll vertical para navegación cómoda.
+---
 
-Edición de ofertas con modal prellenado.
+## Estructura del Proyecto
 
-Eliminación de ofertas con confirmación.
-
-Filtros dinámicos por artículo, variedad y cultivo.
-
-Filtros integrados dentro de los inputs, con iconos de lupa.
-
-Interfaz
-Diseño responsivo con Bootstrap 5.
-
-Estética visual basada en la identidad de marca Veraleza.
-
-Componentes reutilizables y estructura clara.
-
-Tecnologías usadas
-HTML5 / CSS3 / JavaScript (jQuery)
-
-Bootstrap 5
-
-PHP (para lógica backend)
-
-MySQL (base de datos)
-
-Sesiones PHP para autenticación
