@@ -1,2 +1,5 @@
 -Dar formato tabla usuarios
 -Auto completado de lineas
+-filtro de fecha
+-cambiar formato
+-boton actualizar

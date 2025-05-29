@@ -184,7 +184,7 @@ $("#formEditarOferta").on("submit", function (e) {
         }
     }, "json");
 });
-// Eliminar oferta
+//
 $("#confirmar-eliminar-oferta").on("click", function () {
   const id = $("#eliminar-id-oferta").val();
 
