@@ -3,7 +3,7 @@ session_start();
 
 $host = "localhost";
 $db = "demanda";
-$user = "root"; 
+$user = "root";
 $pass = "";
 
 $conn = new mysqli($host, $user, $pass, $db);
@@ -24,18 +24,30 @@ $result = $stmt->get_result();
 if ($result->num_rows === 1) {
     $usuario = $result->fetch_assoc();
 
-    //(por ahora sin hash, pero recomendable usar hash en producción)
+    // Verificación simple de contraseña (sin hash aún)
     if ($usuario['pass'] === $password) {
         $_SESSION['usuario'] = $usuario['nombre'];
         $_SESSION['tipo'] = $usuario['tipo'];
+        $_SESSION['division'] = $usuario['division'];
 
-        if ($usuario['tipo'] === 'administrador') {
-            header("Location: ../administrador.html");
-            exit();
-        } else {
-            header("Location: ../index.html");
-            exit();
+        // Redirección según tipo de usuario
+        switch ($usuario['tipo']) {
+            case 'administrador':
+                header("Location: ../admin.html");
+                break;
+            case 'comprador':
+                header("Location: ../comprador.html");
+                break;
+            case 'comercial':
+                header("Location: ../comercial.html");
+                break;
+            case 'almacen':
+                header("Location: ../almacen.html");
+                break;
+            default:
+                header("Location: ../index.html"); // Fallback
         }
+        exit();
     } else {
         echo "Contraseña incorrecta.";
     }

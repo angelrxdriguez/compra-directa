@@ -1,3 +1,5 @@
+/*Generales*/
+
 body{    
   font-family: "Merriweather Sans", sans-serif !important;
   font-optical-sizing: auto !important;
@@ -5,9 +7,22 @@ body{
   font-style: normal !important;
   background-color: #FFFFE6 !important;
 }
+.btn.btn-primary{
+background-color: #7a7617 !important;
+border: none;
+}
+.btn.btn-primary:hover{
+  background-color: #908C1C !important;
+}
 /*BARRA DE NAVEGACION*/
 .nav-link {
     color: black !important;
+}
+.nav-link.active {
+  border-bottom: #908C1C solid 2px !important;
+}
+.nav-link:hover {
+  color: #908C1C !important;
 }
 /*SESION*/
 .contenedor-sesion {
@@ -17,14 +32,12 @@ body{
   height: 80vh; 
   box-sizing: border-box;
 }
-
 .card.mt-5.log {
   border: none;
   width: 70%;
   margin-left: 15%; /*70 width menos 15 menos 15 -> 30*/
   max-width: 500px; 
 }
-
 .card-body.log {
   background-color: #FFFFE6;
   border: none;
@@ -43,6 +56,42 @@ body{
   border: none;
 }
 .btn.btn-primary.w-100.acceder:hover{
-    background-color: #b3ae22 !important;
+    background-color: #7a7617 !important;
     transition: 0.5s;
 }
+/*ADMINISTRADOR*/
+  .menu-admin {
+    height: calc(100vh - 72px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFE6;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 300px);
+    grid-template-rows: 150px 250px;
+    gap: 20px;
+  }
+
+  .menu-opcion {
+    background-color: #908C1C;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+  }
+
+  .menu-opcion:hover {
+    background-color: #7a7617;
+  }
+
+  .menu-opcion.grande {
+    grid-column: span 2;
+  }
+  /*Adm-usuarios*/
