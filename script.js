@@ -1,8 +1,58 @@
+let tipoUsuario = null; 
+function generarFilaOferta(o) {
+  return `
+    <tr>
+      <td>${o.articulo}</td>
+      <td>${o.variedad}</td>
+      <td>${o.cultivo}</td>
+      <td>${o.fecha}</td>
+      <td>${o.cajas}</td>
+      <td>${o.disponible ?? '-'}</td>
+      <td>${o.reservado ?? '-'}</td>
+      <td>
+        ${tipoUsuario === "comprador" ? `
+          <button class="btn btn-sm btn-primary btn-editar-oferta"
+            data-id="${o.id}" data-articulo="${o.articulo}" data-variedad="${o.variedad}"
+            data-cultivo="${o.cultivo}" data-fecha="${o.fecha}" data-cajas="${o.cajas}">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger btn-eliminar-oferta"
+            data-id="${o.id}">
+            Eliminar
+          </button>
+        ` : `
+          <div class="d-flex">
+            <input type="number" class="form-control form-control-sm input-reserva me-2" 
+              data-id="${o.id}" placeholder="Reservar..." value="${o.mi_reserva ?? ''}">
+            <button class="btn btn-sm btn-success btn-reservar" data-id="${o.id}">
+              Guardar
+            </button>
+          </div>
+        `}
+      </td>
+    </tr>
+  `;
+}
+function cargarOfertas() {
+  $.get("php/obtener_ofertas.php", function (data) {
+    $("#tabla-ofertas tbody").empty();
+    data.forEach(function (oferta) {
+      const fila = generarFilaOferta(oferta);
+      $("#tabla-ofertas tbody").append(fila);
+    });
+
+    // Si tienes filtros activos, reaplícalos
+    if (typeof filtrarTabla === "function") filtrarTabla();
+  }, "json");
+}
+//READY EL DOM !!!!!!!!!!!!!!!!!!!
 $(document).ready(function () {
-     $.get("php/sesion.php", function (datos) {
+  $.get("php/sesion.php", function (datos) {
     if (!datos.error) {
       $("#nombre-usuario").text(datos.nombre);
       $("#tipo-usuario").text(`${datos.tipo} ${datos.division}`);
+      tipoUsuario = datos.tipo;
+      cargarOfertas();  // llama a la función que carga las ofertas
     } else {
       console.warn("No hay sesión activa");
     }
@@ -27,38 +77,48 @@ $(document).ready(function () {
         });
     });
     //cargar oferrtas
-$.get("php/obtener_ofertas.php", function (data) {
-  data.forEach(function (oferta) {
-    $("#tabla-ofertas tbody").append(`
-      <tr>
-        <td>${oferta.articulo}</td>
-        <td>${oferta.variedad}</td>
-        <td>${oferta.cultivo}</td>
-        <td>${oferta.fecha}</td>
-        <td>${oferta.cajas}</td>
-        <td>${oferta.disponible ?? '-'}</td>
-        <td>${oferta.reservado ?? '-'}</td>
-        <td>
-          <button class="btn btn-sm btn-primary btn-editar-oferta"
-            data-id="${oferta.id}" 
-            data-articulo="${oferta.articulo}" 
-            data-variedad="${oferta.variedad}" 
-            data-cultivo="${oferta.cultivo}" 
-            data-fecha="${oferta.fecha}" 
-            data-cajas="${oferta.cajas}">
-            Editar
-          </button>
-          <button class="btn btn-sm btn-danger btn-eliminar-oferta"
-            data-id="${oferta.id}">
-            Eliminar
-          </button>
-        </td>
-      </tr>
-    `);
+
+let ordenAscendente = true;
+
+let ordenActual = {
+  columna: null,
+  ascendente: true
+};
+
+$(".ordenable").on("click", function () {
+  const columna = parseInt($(this).data("columna"));
+
+  // Alternar orden si es la misma columna
+  if (ordenActual.columna === columna) {
+    ordenActual.ascendente = !ordenActual.ascendente;
+  } else {
+    ordenActual.columna = columna;
+    ordenActual.ascendente = true;
+  }
+
+  const filas = $("#tabla-ofertas tbody tr").get();
+
+  filas.sort(function (a, b) { //eq=columna
+    // obtiene el valor de la columna correspondiente
+    let valA = $(a).find(`td:eq(${columna})`).text().toLowerCase();
+    let valB = $(b).find(`td:eq(${columna})`).text().toLowerCase();
+
+    // compara si es indice tal ordena por tal
+    if (columna === 3) {
+      valA = new Date(valA);
+      valB = new Date(valB);
+    }
+
+    if (valA < valB) return ordenActual.ascendente ? -1 : 1;
+    if (valA > valB) return ordenActual.ascendente ? 1 : -1;
+    return 0;
+  });
+
+  $.each(filas, function (_, fila) {
+    $("#tabla-ofertas tbody").append(fila);
   });
 });
 
-// Mostrar modal de confirmación al hacer click en Eliminar
 $(document).on("click", ".btn-eliminar-oferta", function () {
   const id = $(this).data("id");
   $("#eliminar-id-oferta").val(id);
@@ -123,25 +183,62 @@ $("#formCrear").on("submit", function (e) {
 });
 //crear oferta
 $("#form-oferta").on("submit", function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const datos = {
-        articulo: $("#articulo").val(),
-        variedad: $("#variedad").val(),
-        cultivo: $("#cultivo").val(),
-        fecha: $("#fecha").val(),
-        cajas: $("#cajas").val()
-    };
+  const datos = {
+    articulo: $("#articulo").val(),
+    variedad: $("#variedad").val(),
+    cultivo: $("#cultivo").val(),
+    fecha: $("#fecha").val(),
+    cajas: $("#cajas").val()
+  };
 
-    $.post("php/crear_oferta.php", datos, function (respuesta) {
-        if (respuesta.success) {
-            alert("Oferta registrada correctamente.");
-            location.reload();
-        } else {
-            alert("Error al guardar: " + respuesta.error);
-        }
-    }, "json");
+  $.post("php/crear_oferta.php", datos, function (respuesta) {
+    if (respuesta.success && respuesta.oferta) {
+      const o = respuesta.oferta;
+
+      // Crear la fila nueva
+      const fila = `
+        <tr>
+          <td>${o.articulo}</td>
+          <td>${o.variedad}</td>
+          <td>${o.cultivo}</td>
+          <td>${o.fecha}</td>
+          <td>${o.cajas}</td>
+          <td>${o.disponible ?? '-'}</td>
+          <td>${o.reservado ?? '-'}</td>
+          <td>
+            <button class="btn btn-sm btn-primary btn-editar-oferta"
+              data-id="${o.id}"
+              data-articulo="${o.articulo}"
+              data-variedad="${o.variedad}"
+              data-cultivo="${o.cultivo}"
+              data-fecha="${o.fecha}"
+              data-cajas="${o.cajas}">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger btn-eliminar-oferta"
+              data-id="${o.id}">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `;
+
+      // Añadirla al principio de la tabla
+      $("#tabla-ofertas tbody").prepend(fila);
+
+      // Limpiar el formulario
+      $("#form-oferta")[0].reset();
+
+      // Reaplicar filtros si hay función
+      if (typeof filtrarTabla === "function") filtrarTabla();
+    } else {
+      alert("Error al guardar: " + (respuesta.error || "Sin detalles."));
+    }
+  }, "json");
 });
+
 //editar oferta
 $(document).on("click", ".btn-editar-oferta", function () {
     const id = $(this).data("id");
@@ -219,6 +316,35 @@ function filtrarTabla() {
 }
 $("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", filtrarTabla);
 });
+//RESERVAS***************
+$(document).on("click", ".btn-reservar", function () {
+    const btn = $(this);
+    const idOferta = btn.data("id");
+    const input = btn.closest("tr").find(".input-reserva");
+    const cajas = parseFloat(input.val());
+
+    if (isNaN(cajas) || cajas < 0) {
+        alert("Introduce una cantidad válida.");
+        return;
+    }
+
+    $.post("php/crear_reserva.php", { id_oferta: idOferta, cajas: cajas }, function (respuesta) {
+        if (respuesta.success) {
+            alert("Reserva actualizada correctamente.");
+        } else {
+            alert("Error al guardar la reserva: " + (respuesta.error || "desconocido."));
+        }
+    }, "json");
+});
+$.post("php/crear_reserva.php", { id_oferta: idOferta, cajas: cajas }, function (respuesta) {
+    if (respuesta.success) {
+        alert("Reserva actualizada correctamente.");
+        cargarOfertas(); // <- recarga datos
+    } else {
+        alert("Error al guardar la reserva: " + (respuesta.error || "desconocido."));
+    }
+}, "json");
+
 // Cerrar sesión
   $(document).on("click", "#cerrar-sesion", function (e) {
     e.preventDefault();

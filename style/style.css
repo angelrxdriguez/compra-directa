@@ -72,7 +72,7 @@ width: 350px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #FFFFE6;
+    background-color: #FFFFE6 !important;
   }
 
   .menu-grid {
@@ -107,5 +107,10 @@ width: 350px;
   overflow-y: auto;
   border: 2px solid #000000; 
   border-radius: 10px;
+}
+th{
+  background-color: #908C1C !important;
+  color: white !important;
+  text-align: center;
 }
   /*Adm-usuarios*/
