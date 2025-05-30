@@ -1,5 +1,10 @@
 -Dar formato tabla usuarios
 -Auto completado de lineas
 -filtro de fecha
--cambiar formato
--boton actualizar
+-FORMATO EU FECHA
+-boton actualizar al lado de tabla para actualizar tabla****
+
+-NO disponible mostrar de alguna forma visual (color rojo...)
+-Fecha Llegada fecha de recepcion.... Cambiar th
+-meter lo de %algoritomo% para variedades y cultivos****
+-Campo fecha con hour-min para comerciales y compradores -> fecha de movimento con hora y minuto

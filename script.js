@@ -47,6 +47,7 @@ function cargarOfertas() {
     if (typeof filtrarTabla === "function") filtrarTabla();
   }, "json");
 }
+
 //READY EL DOM !!!!!!!!!!!!!!!!!!!
 $(document).ready(function () {
   $.get("php/sesion.php", function (datos) {
@@ -317,7 +318,37 @@ function filtrarTabla() {
   });
 }
 $("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", filtrarTabla);
+// AUTOCOMPLETE cultivo
+$("#cultivo").autocomplete({
+  source: function (request, response) {
+    $.ajax({
+      url: "php/buscar_cultivos.php",
+      dataType: "json",
+      data: { term: request.term },
+      success: function (data) {
+        response(data);
+      }
+    });
+  },
+  minLength: 1
 });
+
+// AUTOCOMPLETE variedad * por hacer
+$("#variedad").autocomplete({
+  source: function (request, response) {
+    $.ajax({
+      url: "php/buscar_variedades.php",
+      dataType: "json",
+      data: { term: request.term },
+      success: function (data) {
+        response(data);
+      }
+    });
+  },
+  minLength: 1
+});
+
+});//acabe ready
 //RESERVAS***************
 $(document).on("click", ".btn-reservar", function () {
   const btn = $(this);
@@ -333,7 +364,7 @@ $(document).on("click", ".btn-reservar", function () {
   $.post("php/crear_reserva.php", { id_oferta: idOferta, cajas: cajas }, function (respuesta) {
     if (respuesta.success) {
       alert("Reserva actualizada correctamente.");
-      cargarOfertas(); //importante si quieres actualizar disponible/reservado
+      cargarOfertas(); //importante actualizar disponible/reservado
     } else {
       alert("Error al guardar la reserva: " + (respuesta.error || "desconocido."));
     }
