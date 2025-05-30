@@ -1,5 +1,7 @@
 <?php
 session_start();
+error_log("ID DE USUARIO EN SESIÓN: " . ($_SESSION['usuario_id'] ?? 'NO DEFINIDO'));
+
 
 $host = "localhost";
 $db = "demanda";
@@ -13,14 +15,14 @@ if ($conn->connect_error) {
 
 $response = [];
 
-if (!isset($_SESSION['usuario'])) {
+if (!isset($_SESSION['usuario_id'])) {
     $response['success'] = false;
     $response['error'] = 'Sesión no iniciada.';
     echo json_encode($response);
     exit;
 }
 
-$id_usuario = $_SESSION['usuario'];
+$id_usuario = $_SESSION['usuario_id'];
 $id_oferta = $_POST['id_oferta'];
 $cajas_reservadas = $_POST['cajas'];
 

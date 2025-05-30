@@ -1,6 +1,5 @@
 <?php
 session_start();
-header('Content-Type: application/json');
 
 $host = "localhost";
 $db = "demanda";
@@ -9,18 +8,26 @@ $pass = "";
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
-    die(json_encode(["error" => "Conexión fallida: " . $conn->connect_error]));
+    die("Conexión fallida: " . $conn->connect_error);
 }
 
-$id_usuario = $_SESSION['usuario'] ?? null;
+$id_usuario = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : 0;
 
 $sql = "
-SELECT o.*, 
-       o.cajas - IFNULL(SUM(r.cajas_reservadas), 0) AS disponible,
-       IFNULL(SUM(r.cajas_reservadas), 0) AS reservado,
-       (SELECT cajas_reservadas FROM reservas WHERE id_usuario = ? AND id_oferta = o.id) AS mi_reserva
-FROM ofertas o
-LEFT JOIN reservas r ON r.id_oferta = o.id
+SELECT 
+    o.id,
+    o.articulo,
+    o.variedad,
+    o.cultivo,
+    o.fecha,
+    o.cajas,
+    o.cajas - IFNULL(SUM(r2.cajas_reservadas), 0) AS disponible,
+    IFNULL(SUM(r2.cajas_reservadas), 0) AS reservado,
+    r1.cajas_reservadas AS mi_reserva
+FROM 
+    ofertas o
+LEFT JOIN reservas r1 ON r1.id_oferta = o.id AND r1.id_usuario = ?
+LEFT JOIN reservas r2 ON r2.id_oferta = o.id
 GROUP BY o.id
 ORDER BY o.fecha DESC
 ";
@@ -32,10 +39,8 @@ $result = $stmt->get_result();
 
 $ofertas = [];
 while ($row = $result->fetch_assoc()) {
-    $row['mi_reserva'] = $row['mi_reserva'] !== null ? (float) $row['mi_reserva'] : null;
     $ofertas[] = $row;
 }
 
+header('Content-Type: application/json');
 echo json_encode($ofertas);
-$stmt->close();
-$conn->close();

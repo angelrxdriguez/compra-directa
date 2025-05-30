@@ -26,7 +26,9 @@ if ($result->num_rows === 1) {
 
     // Verificación simple de contraseña (sin hash aún)
     if ($usuario['pass'] === $password) {
-        $_SESSION['usuario'] = $usuario['nombre'];
+       $_SESSION['usuario_id'] = $usuario['id'];          // ID real del usuario
+$_SESSION['usuario_nombre'] = $usuario['nombre'];  // Nombre del usuario
+
         $_SESSION['tipo'] = $usuario['tipo'];
         $_SESSION['division'] = $usuario['division'];
 

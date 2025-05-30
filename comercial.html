@@ -85,89 +85,9 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody> <tr>
-  <td>Rosa</td>
-  <td>Explorer 50</td>
-  <td>Ponderosa</td>
-  <td>2025-05-29</td>
-  <td>10.0</td>
-  <td>7.0</td>
-  <td>3.0</td>
-  <td>
-    <div class="d-flex align-items-center">
-      <input type="number" class="form-control form-control-sm me-2 input-reserva" style="width: 70px;" min="0.5" step="0.5">
-      <button class="btn btn-sm btn-success btn-confirmar-reserva"><i class="bi bi-check-circle"></i></button>
-    </div>
-  </td>
-</tr>
+                <tbody>
 </tbody>
             </table>
-        </div>
-
-        <!--modales-->
-        <div class="modal fade" id="modalEditarOferta" tabindex="-1" aria-labelledby="modalEditarOfertaLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalEditarOfertaLabel">Editar Oferta</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="formEditarOferta">
-                            <input type="hidden" id="edit-id-oferta">
-                            <div class="mb-3">
-                                <label for="edit-articulo" class="form-label">Artículo</label>
-                                <select class="form-select" id="edit-articulo">
-                                    <option value="Rosa">Rosa</option>
-                                    <option value="Clavel">Clavel</option>
-                                    <option value="Paniculata">Paniculata</option>
-                                    <option value="Alstromelia">Alstromelia</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="edit-variedad" class="form-label">Variedad</label>
-                                <input type="text" class="form-control" id="edit-variedad">
-                            </div>
-                            <div class="mb-3">
-                                <label for="edit-cultivo" class="form-label">Cultivo</label>
-                                <input type="text" class="form-control" id="edit-cultivo">
-                            </div>
-                            <div class="mb-3">
-                                <label for="edit-fecha" class="form-label">Fecha</label>
-                                <input type="date" class="form-control" id="edit-fecha">
-                            </div>
-                            <div class="mb-3">
-                                <label for="edit-cajas" class="form-label">Cajas</label>
-                                <input type="number" step="0.5" min="0.5" class="form-control" id="edit-cajas">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary" form="formEditarOferta">Guardar cambios</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="modalEliminarOferta" tabindex="-1" aria-labelledby="modalEliminarOfertaLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalEliminarOfertaLabel">Confirmar Eliminación</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        ¿Estás seguro de que deseas eliminar esta oferta?
-                        <input type="hidden" id="eliminar-id-oferta">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-danger" id="confirmar-eliminar-oferta">Eliminar</button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

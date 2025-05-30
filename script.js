@@ -318,32 +318,26 @@ $("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", filtrarTabl
 });
 //RESERVAS***************
 $(document).on("click", ".btn-reservar", function () {
-    const btn = $(this);
-    const idOferta = btn.data("id");
-    const input = btn.closest("tr").find(".input-reserva");
-    const cajas = parseFloat(input.val());
+  const btn = $(this);
+  const idOferta = btn.data("id");
+  const input = btn.closest("tr").find(".input-reserva");
+  const cajas = parseFloat(input.val());
 
-    if (isNaN(cajas) || cajas < 0) {
-        alert("Introduce una cantidad válida.");
-        return;
-    }
+  if (isNaN(cajas) || cajas < 0) {
+    alert("Introduce una cantidad válida.");
+    return;
+  }
 
-    $.post("php/crear_reserva.php", { id_oferta: idOferta, cajas: cajas }, function (respuesta) {
-        if (respuesta.success) {
-            alert("Reserva actualizada correctamente.");
-        } else {
-            alert("Error al guardar la reserva: " + (respuesta.error || "desconocido."));
-        }
-    }, "json");
-});
-$.post("php/crear_reserva.php", { id_oferta: idOferta, cajas: cajas }, function (respuesta) {
+  $.post("php/crear_reserva.php", { id_oferta: idOferta, cajas: cajas }, function (respuesta) {
     if (respuesta.success) {
-        alert("Reserva actualizada correctamente.");
-        cargarOfertas(); // <- recarga datos
+      alert("Reserva actualizada correctamente.");
+      cargarOfertas(); //importante si quieres actualizar disponible/reservado
     } else {
-        alert("Error al guardar la reserva: " + (respuesta.error || "desconocido."));
+      alert("Error al guardar la reserva: " + (respuesta.error || "desconocido."));
     }
-}, "json");
+  }, "json");
+});
+
 
 // Cerrar sesión
   $(document).on("click", "#cerrar-sesion", function (e) {
