@@ -11,7 +11,7 @@ if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
 
-$id_usuario = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : 0;
+$id_usuario = isset($_SESSION['usuario_id']) ? $_SESSION['usuario_id'] : 0;
 
 $sql = "
 SELECT 
@@ -44,3 +44,4 @@ while ($row = $result->fetch_assoc()) {
 
 header('Content-Type: application/json');
 echo json_encode($ofertas);
+?>

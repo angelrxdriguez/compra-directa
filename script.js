@@ -9,6 +9,7 @@ function generarFilaOferta(o) {
       <td>${o.cajas}</td>
       <td>${o.disponible ?? '-'}</td>
       <td>${o.reservado ?? '-'}</td>
+      ${tipoUsuario === "comercial" ? `<td>${o.mi_reserva ?? '-'}</td>` : ''}
       <td>
         ${tipoUsuario === "comprador" ? `
           <button class="btn btn-sm btn-primary btn-editar-oferta"
@@ -33,6 +34,7 @@ function generarFilaOferta(o) {
     </tr>
   `;
 }
+
 function cargarOfertas() {
   $.get("php/obtener_ofertas.php", function (data) {
     $("#tabla-ofertas tbody").empty();
