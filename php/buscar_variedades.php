@@ -13,7 +13,7 @@ $termino = $_GET['term'] ?? '';
 
 $sql = "SELECT nombre FROM variedades WHERE nombre LIKE ? LIMIT 10";
 $stmt = $conn->prepare($sql);
-$likeTerm = "$termino%";
+$likeTerm = "%$termino%";
 $stmt->bind_param("s", $likeTerm);
 $stmt->execute();
 $result = $stmt->get_result();
