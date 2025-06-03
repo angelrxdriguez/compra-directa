@@ -236,62 +236,54 @@ $("#filtro-cultivo").val(localStorage.getItem("filtro-cultivo") || "");
     }, "json");
   });
   //crear oferta
-  $("#form-oferta").on("submit", function (e) {
-    e.preventDefault();
+let variedadPendiente = "";
+let cultivoPendiente = "";
 
-    const datos = {
-      articulo: $("#articulo").val(),
-      variedad: $("#variedad").val(),
-      cultivo: $("#cultivo").val(),
-      fecha: $("#fecha").val(),
-      cajas: $("#cajas").val()
-    };
+$("#form-oferta").on("submit", function (e) {
+  e.preventDefault();
 
-    $.post("php/crear_oferta.php", datos, function (respuesta) {
-      if (respuesta.success && respuesta.oferta) {
-        const o = respuesta.oferta;
+  const variedad = $("#variedad").val().trim();
+  const cultivo = $("#cultivo").val().trim();
+  const faltantes = [];
 
-        // Crear la fila nueva
-        const fila = `
-        <tr>
-          <td>${o.articulo}</td>
-          <td>${o.variedad}</td>
-          <td>${o.cultivo}</td>
-          <td>${o.fecha}</td>
-          <td>${o.cajas}</td>
-          <td>${o.disponible ?? '-'}</td>
-          <td>${o.reservado ?? '-'}</td>
-          <td>
-            <button class="btn btn-sm btn-primary btn-editar-oferta"
-              data-id="${o.id}"
-              data-articulo="${o.articulo}"
-              data-variedad="${o.variedad}"
-              data-cultivo="${o.cultivo}"
-              data-fecha="${o.fecha}"
-              data-cajas="${o.cajas}">
-              Editar
-            </button>
-            <button class="btn btn-sm btn-danger btn-eliminar-oferta"
-              data-id="${o.id}">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      `;
+  $.when(
+    $.post("php/existe_variedad.php", { variedad }),
+    $.post("php/existe_cultivo.php", { cultivo })
+  ).done(function (resVariedad, resCultivo) {
+    const existeVariedad = resVariedad[0].existe;
+    const existeCultivo = resCultivo[0].existe;
 
-        // Añadirla al principio de la tabla
-        $("#tabla-ofertas tbody").prepend(fila);
+    variedadPendiente = !existeVariedad ? variedad : "";
+    cultivoPendiente = !existeCultivo ? cultivo : "";
 
-        // Limpiar el formulario
-        $("#form-oferta")[0].reset();
+    if (!existeVariedad) faltantes.push(`la variedad <b>${variedad}</b>`);
+    if (!existeCultivo) faltantes.push(`el cultivo <b>${cultivo}</b>`);
 
-        // Reaplicar filtros si hay función
-        if (typeof filtrarTabla === "function") filtrarTabla();
-      } else {
-        alert("Error al guardar: " + (respuesta.error || "Sin detalles."));
-      }
-    }, "json");
+    if (faltantes.length > 0) {
+      $("#mensaje-modal-registro").html(`${faltantes.join(" y ")} no están registrados. ¿Deseas registrarlos?`);
+      new bootstrap.Modal(document.getElementById("modalConfirmarRegistro")).show();
+    } else {
+      crearOferta(); // Si todo existe, crear directamente
+    }
   });
+});
+
+$("#confirmar-registro-cultivo-variedad").on("click", function () {
+  const registros = [];
+
+  if (variedadPendiente) {
+    registros.push($.post("php/insertar_variedad.php", { variedad: variedadPendiente }));
+  }
+  if (cultivoPendiente) {
+    registros.push($.post("php/insertar_cultivo.php", { cultivo: cultivoPendiente }));
+  }
+
+  Promise.all(registros).then(() => {
+    bootstrap.Modal.getInstance(document.getElementById("modalConfirmarRegistro")).hide();
+    crearOferta();
+    cargarOfertas(); 
+  });
+});
 
   //editar oferta
   $(document).on("click", ".btn-editar-oferta", function () {
@@ -398,6 +390,26 @@ $("#filtro-cultivo").val(localStorage.getItem("filtro-cultivo") || "");
     },
     minLength: 1
   });
+function crearOferta() {
+  const datos = {
+    articulo: $("#articulo").val(),
+    variedad: $("#variedad").val(),
+    cultivo: $("#cultivo").val(),
+    fecha: $("#fecha").val(),
+    cajas: $("#cajas").val()
+  };
+
+  $.post("php/crear_oferta.php", datos, function (respuesta) {
+    if (respuesta.success && respuesta.oferta) {
+      const fila = generarFilaOferta(respuesta.oferta);
+      $("#tabla-ofertas tbody").prepend(fila);
+      $("#form-oferta")[0].reset();
+      if (typeof filtrarTabla === "function") filtrarTabla();
+    } else {
+      alert("Error al guardar: " + (respuesta.error || "Sin detalles."));
+    }
+  }, "json");
+}
 
 });//acabe ready
 //RESERVAS***************
