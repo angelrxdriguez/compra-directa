@@ -376,7 +376,7 @@ $("#confirmar-registro-cultivo-variedad").on("click", function () {
     minLength: 1
   });
 
-  // AUTOCOMPLETE variedad * por hacer
+  // AUTOCOMPLETE variedad hecho
   $("#variedad").autocomplete({
     source: function (request, response) {
       $.ajax({

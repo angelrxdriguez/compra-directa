@@ -5,7 +5,7 @@ VeralezaIT2025
 -borra los filtros
 -campo select creacion de articulo
 -btn filtro manual
-
+-double en disponible y reservado
 
 session_start();
  $host = "localhost";
