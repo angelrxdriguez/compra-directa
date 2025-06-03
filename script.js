@@ -55,10 +55,6 @@ function formatearFecha(fechaStr) {
 }
 
 function cargarOfertas() {
-  const filtroArticulo = $("#filtro-articulo").val();
-  const filtroVariedad = $("#filtro-variedad").val();
-  const filtroCultivo = $("#filtro-cultivo").val();
-
   $.get("php/obtener_ofertas.php", function (data) {
     const $tbody = $("#tabla-ofertas tbody");
     $tbody.empty();
@@ -71,31 +67,37 @@ function cargarOfertas() {
 
     $tbody.append(fragmento);
 
-    // Restaurar valores de inputs por si se pierden
-    $("#filtro-articulo").val(filtroArticulo);
-    $("#filtro-variedad").val(filtroVariedad);
-    $("#filtro-cultivo").val(filtroCultivo);
-
-    // Aplicar filtro una vez la tabla esté lista
-    setTimeout(filtrarTabla, 0);  // clave
+    filtrarTabla(); // aplicar los filtros tal como están en los inputs
   }, "json");
 }
 
 
 
+$("#btn-actualizar-ofertas").on("click", function () {
+  localStorage.setItem("filtro-articulo", $("#filtro-articulo").val());
+  localStorage.setItem("filtro-variedad", $("#filtro-variedad").val());
+  localStorage.setItem("filtro-cultivo", $("#filtro-cultivo").val());
+
+  cargarOfertas();
+});
+
+
+
 //READY EL DOM !!!!!!!!!!!!!!!!!!!
 $(document).ready(function () {
+$("#filtro-articulo").val(localStorage.getItem("filtro-articulo") || "");
+$("#filtro-variedad").val(localStorage.getItem("filtro-variedad") || "");
+$("#filtro-cultivo").val(localStorage.getItem("filtro-cultivo") || "");
+
   $.get("php/sesion.php", function (datos) {
     if (!datos.error) {
       $("#nombre-usuario").text(datos.nombre);
       $("#tipo-usuario").text(`${datos.tipo} ${datos.division}`);
       tipoUsuario = datos.tipo;
       cargarOfertas();  // llama a la función que carga las ofertas
-      setInterval(() => {
         if (!$("body").hasClass("modal-open")) {
           cargarOfertas();
         }
-      }, 5000);
     } else {
       console.warn("No hay sesión activa");
     }
@@ -119,6 +121,15 @@ $(document).ready(function () {
       `);
     });
   });
+  // Filtros de usuarios
+  $("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", function () {
+  localStorage.setItem("filtro-articulo", $("#filtro-articulo").val());
+  localStorage.setItem("filtro-variedad", $("#filtro-variedad").val());
+  localStorage.setItem("filtro-cultivo", $("#filtro-cultivo").val());
+
+  filtrarTabla(); // seguir aplicando en tiempo real
+});
+
   //cargar oferrtas
 
   let ordenAscendente = true;

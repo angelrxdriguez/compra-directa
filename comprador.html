@@ -77,26 +77,32 @@
             </div>
         </form>
         <hr>
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" id="filtro-articulo" class="form-control" placeholder="Filtrar por Artículo">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" id="filtro-variedad" class="form-control" placeholder="Filtrar por Variedad">
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" id="filtro-cultivo" class="form-control" placeholder="Filtrar por Cultivo">
-                </div>
-            </div>
-        </div>
+<div class="row align-items-end mb-3">
+  <div class="col-md-3">
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" id="filtro-articulo" class="form-control" placeholder="Filtrar por Artículo">
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" id="filtro-variedad" class="form-control" placeholder="Filtrar por Variedad">
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" id="filtro-cultivo" class="form-control" placeholder="Filtrar por Cultivo">
+    </div>
+  </div>
+  <div class="col-md-3 text-end">
+    <button id="btn-actualizar-ofertas" class="btn btn-success w-100">
+      <i class="bi bi-arrow-clockwise me-1"></i> Actualizar tabla
+    </button>
+  </div>
+</div>
+
 
         <div class="tabla-scrollable">
             <table class="table table-striped" id="tabla-ofertas">
