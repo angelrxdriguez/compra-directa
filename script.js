@@ -1,13 +1,26 @@
-let tipoUsuario = null; 
+let tipoUsuario = null;
 function generarFilaOferta(o) {
   return `
-    <tr>
+<tr class="${
+  Number(o.disponible) === 0
+    ? 'sin-stock'
+    : Number(o.disponible) < 5
+    ? 'poco-stock'
+    : 'ok-stock'
+}">
+
+
       <td>${o.articulo}</td>
       <td>${o.variedad}</td>
       <td>${o.cultivo}</td>
-      <td>${o.fecha}</td>
+<td>${formatearFecha(o.fecha)}</td>
       <td>${o.cajas}</td>
-      <td>${o.disponible ?? '-'}</td>
+  <td class="columna-disponible">
+  <span class="${o.disponible == 0 ? 'disponible-cero' : o.disponible < 5 ? 'disponible-bajo' : 'disponible-ok'}">
+    ${o.disponible ?? '-'}
+  </span>
+</td>
+
       <td>${o.reservado ?? '-'}</td>
       ${tipoUsuario === "comercial" ? `<td>${o.mi_reserva ?? '-'}</td>` : ''}
       <td>
@@ -26,7 +39,7 @@ function generarFilaOferta(o) {
             <input type="number" class="form-control form-control-sm input-reserva me-2" 
               data-id="${o.id}" placeholder="Reservar..." value="${o.mi_reserva ?? ''}">
             <button class="btn btn-sm btn-success btn-reservar" data-id="${o.id}">
-              Guardar
+              Reservar
             </button>
           </div>
         `}
@@ -34,19 +47,41 @@ function generarFilaOferta(o) {
     </tr>
   `;
 }
+function formatearFecha(fechaStr) {
+  if (!fechaStr) return '';
+  const partes = fechaStr.split("-");
+  if (partes.length !== 3) return fechaStr;
+  return `${partes[2]}/${partes[1]}/${partes[0]}`; // dd/mm/yyyy
+}
 
 function cargarOfertas() {
+  const filtroArticulo = $("#filtro-articulo").val();
+  const filtroVariedad = $("#filtro-variedad").val();
+  const filtroCultivo = $("#filtro-cultivo").val();
+
   $.get("php/obtener_ofertas.php", function (data) {
-    $("#tabla-ofertas tbody").empty();
+    const $tbody = $("#tabla-ofertas tbody");
+    $tbody.empty();
+
+    const fragmento = $(document.createDocumentFragment());
     data.forEach(function (oferta) {
       const fila = generarFilaOferta(oferta);
-      $("#tabla-ofertas tbody").append(fila);
+      fragmento.append(fila);
     });
 
-    // Si tienes filtros activos, reaplícalos
-    if (typeof filtrarTabla === "function") filtrarTabla();
+    $tbody.append(fragmento);
+
+    // Restaurar valores de inputs por si se pierden
+    $("#filtro-articulo").val(filtroArticulo);
+    $("#filtro-variedad").val(filtroVariedad);
+    $("#filtro-cultivo").val(filtroCultivo);
+
+    // Aplicar filtro una vez la tabla esté lista
+    setTimeout(filtrarTabla, 0);  // clave
   }, "json");
 }
+
+
 
 //READY EL DOM !!!!!!!!!!!!!!!!!!!
 $(document).ready(function () {
@@ -56,14 +91,19 @@ $(document).ready(function () {
       $("#tipo-usuario").text(`${datos.tipo} ${datos.division}`);
       tipoUsuario = datos.tipo;
       cargarOfertas();  // llama a la función que carga las ofertas
+      setInterval(() => {
+        if (!$("body").hasClass("modal-open")) {
+          cargarOfertas();
+        }
+      }, 5000);
     } else {
       console.warn("No hay sesión activa");
     }
   }, "json");
-  
-    $.get("php/obtener_usuarios.php", function (data) {
-        data.forEach(function (usuario) {
-            $("#tabla-usuarios tbody").append(`
+
+  $.get("php/obtener_usuarios.php", function (data) {
+    data.forEach(function (usuario) {
+      $("#tabla-usuarios tbody").append(`
         <tr>
           <td>${usuario.id}</td>
           <td>${usuario.nombre}</td>
@@ -77,60 +117,60 @@ $(document).ready(function () {
       </td>
         </tr>
       `);
-        });
     });
-    //cargar oferrtas
+  });
+  //cargar oferrtas
 
-let ordenAscendente = true;
+  let ordenAscendente = true;
 
-let ordenActual = {
-  columna: null,
-  ascendente: true
-};
+  let ordenActual = {
+    columna: null,
+    ascendente: true
+  };
 
-$(".ordenable").on("click", function () {
-  const columna = parseInt($(this).data("columna"));
+  $(".ordenable").on("click", function () {
+    const columna = parseInt($(this).data("columna"));
 
-  // Alternar orden si es la misma columna
-  if (ordenActual.columna === columna) {
-    ordenActual.ascendente = !ordenActual.ascendente;
-  } else {
-    ordenActual.columna = columna;
-    ordenActual.ascendente = true;
-  }
-
-  const filas = $("#tabla-ofertas tbody tr").get();
-
-  filas.sort(function (a, b) { //eq=columna
-    // obtiene el valor de la columna correspondiente
-    let valA = $(a).find(`td:eq(${columna})`).text().toLowerCase();
-    let valB = $(b).find(`td:eq(${columna})`).text().toLowerCase();
-
-    // compara si es indice tal ordena por tal
-    if (columna === 3) {
-      valA = new Date(valA);
-      valB = new Date(valB);
+    // Alternar orden si es la misma columna
+    if (ordenActual.columna === columna) {
+      ordenActual.ascendente = !ordenActual.ascendente;
+    } else {
+      ordenActual.columna = columna;
+      ordenActual.ascendente = true;
     }
 
-    if (valA < valB) return ordenActual.ascendente ? -1 : 1;
-    if (valA > valB) return ordenActual.ascendente ? 1 : -1;
-    return 0;
+    const filas = $("#tabla-ofertas tbody tr").get();
+
+    filas.sort(function (a, b) { //eq=columna
+      // obtiene el valor de la columna correspondiente
+      let valA = $(a).find(`td:eq(${columna})`).text().toLowerCase();
+      let valB = $(b).find(`td:eq(${columna})`).text().toLowerCase();
+
+      // compara si es indice tal ordena por tal
+      if (columna === 3) {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return ordenActual.ascendente ? -1 : 1;
+      if (valA > valB) return ordenActual.ascendente ? 1 : -1;
+      return 0;
+    });
+
+    $.each(filas, function (_, fila) {
+      $("#tabla-ofertas tbody").append(fila);
+    });
   });
 
-  $.each(filas, function (_, fila) {
-    $("#tabla-ofertas tbody").append(fila);
+  $(document).on("click", ".btn-eliminar-oferta", function () {
+    const id = $(this).data("id");
+    $("#eliminar-id-oferta").val(id);
+    const modal = new bootstrap.Modal(document.getElementById("modalEliminarOferta"));
+    modal.show();
   });
-});
 
-$(document).on("click", ".btn-eliminar-oferta", function () {
-  const id = $(this).data("id");
-  $("#eliminar-id-oferta").val(id);
-  const modal = new bootstrap.Modal(document.getElementById("modalEliminarOferta"));
-  modal.show();
-});
-
-/*BOTONES y FORMS*/
-$(document).on("click", ".btn-editar", function () {
+  /*BOTONES y FORMS*/
+  $(document).on("click", ".btn-editar", function () {
     const id = $(this).data("id");
     const nombre = $(this).data("nombre");
     const tipo = $(this).data("tipo");
@@ -143,65 +183,65 @@ $(document).on("click", ".btn-editar", function () {
 
     const modal = new bootstrap.Modal(document.getElementById("modalEditar"));
     modal.show();
-});
-//editar usuario
-$("#formEditar").on("submit", function (e) {
+  });
+  //editar usuario
+  $("#formEditar").on("submit", function (e) {
     e.preventDefault();
 
     const datos = {
-        id: $("#edit-id").val(),
-        nombre: $("#edit-nombre").val(),
-        tipo: $("#edit-tipo").val(),
-        division: $("#edit-division").val()
+      id: $("#edit-id").val(),
+      nombre: $("#edit-nombre").val(),
+      tipo: $("#edit-tipo").val(),
+      division: $("#edit-division").val()
     };
 
     $.post("php/actualizar_usuario.php", datos, function (respuesta) {
-        if (respuesta.success) {
-            alert("Usuario actualizado correctamente.");
-            location.reload();
-        } else {
-            alert("Error al actualizar: " + respuesta.error);
-        }
+      if (respuesta.success) {
+        alert("Usuario actualizado correctamente.");
+        location.reload();
+      } else {
+        alert("Error al actualizar: " + respuesta.error);
+      }
     }, "json");
-});
-$("#formCrear").on("submit", function (e) {
+  });
+  $("#formCrear").on("submit", function (e) {
     e.preventDefault();
 
     const datos = {
-        nombre: $("#crear-nombre").val(),
-        pass: $("#crear-pass").val(),
-        tipo: $("#crear-tipo").val(),
-        division: $("#crear-division").val()
+      nombre: $("#crear-nombre").val(),
+      pass: $("#crear-pass").val(),
+      tipo: $("#crear-tipo").val(),
+      division: $("#crear-division").val()
     };
 
     $.post("php/crear_usuario.php", datos, function (respuesta) {
-        if (respuesta.success) {
-            alert("Usuario creado correctamente.");
-            $("#modalCrear").modal("hide");
-            location.reload();
-        } else {
-            alert("Error: " + respuesta.error);
-        }
+      if (respuesta.success) {
+        alert("Usuario creado correctamente.");
+        $("#modalCrear").modal("hide");
+        location.reload();
+      } else {
+        alert("Error: " + respuesta.error);
+      }
     }, "json");
-});
-//crear oferta
-$("#form-oferta").on("submit", function (e) {
-  e.preventDefault();
+  });
+  //crear oferta
+  $("#form-oferta").on("submit", function (e) {
+    e.preventDefault();
 
-  const datos = {
-    articulo: $("#articulo").val(),
-    variedad: $("#variedad").val(),
-    cultivo: $("#cultivo").val(),
-    fecha: $("#fecha").val(),
-    cajas: $("#cajas").val()
-  };
+    const datos = {
+      articulo: $("#articulo").val(),
+      variedad: $("#variedad").val(),
+      cultivo: $("#cultivo").val(),
+      fecha: $("#fecha").val(),
+      cajas: $("#cajas").val()
+    };
 
-  $.post("php/crear_oferta.php", datos, function (respuesta) {
-    if (respuesta.success && respuesta.oferta) {
-      const o = respuesta.oferta;
+    $.post("php/crear_oferta.php", datos, function (respuesta) {
+      if (respuesta.success && respuesta.oferta) {
+        const o = respuesta.oferta;
 
-      // Crear la fila nueva
-      const fila = `
+        // Crear la fila nueva
+        const fila = `
         <tr>
           <td>${o.articulo}</td>
           <td>${o.variedad}</td>
@@ -228,22 +268,22 @@ $("#form-oferta").on("submit", function (e) {
         </tr>
       `;
 
-      // Añadirla al principio de la tabla
-      $("#tabla-ofertas tbody").prepend(fila);
+        // Añadirla al principio de la tabla
+        $("#tabla-ofertas tbody").prepend(fila);
 
-      // Limpiar el formulario
-      $("#form-oferta")[0].reset();
+        // Limpiar el formulario
+        $("#form-oferta")[0].reset();
 
-      // Reaplicar filtros si hay función
-      if (typeof filtrarTabla === "function") filtrarTabla();
-    } else {
-      alert("Error al guardar: " + (respuesta.error || "Sin detalles."));
-    }
-  }, "json");
-});
+        // Reaplicar filtros si hay función
+        if (typeof filtrarTabla === "function") filtrarTabla();
+      } else {
+        alert("Error al guardar: " + (respuesta.error || "Sin detalles."));
+      }
+    }, "json");
+  });
 
-//editar oferta
-$(document).on("click", ".btn-editar-oferta", function () {
+  //editar oferta
+  $(document).on("click", ".btn-editar-oferta", function () {
     const id = $(this).data("id");
     const articulo = $(this).data("articulo");
     const variedad = $(this).data("variedad");
@@ -260,93 +300,93 @@ $(document).on("click", ".btn-editar-oferta", function () {
 
     const modal = new bootstrap.Modal(document.getElementById("modalEditarOferta"));
     modal.show();
-});
-$("#formEditarOferta").on("submit", function (e) {
+  });
+  $("#formEditarOferta").on("submit", function (e) {
     e.preventDefault();
 
     const datos = {
-        id: $("#edit-id-oferta").val(),
-        articulo: $("#edit-articulo").val(),
-        variedad: $("#edit-variedad").val(),
-        cultivo: $("#edit-cultivo").val(),
-        fecha: $("#edit-fecha").val(),
-        cajas: $("#edit-cajas").val()
+      id: $("#edit-id-oferta").val(),
+      articulo: $("#edit-articulo").val(),
+      variedad: $("#edit-variedad").val(),
+      cultivo: $("#edit-cultivo").val(),
+      fecha: $("#edit-fecha").val(),
+      cajas: $("#edit-cajas").val()
     };
 
     $.post("php/actualizar_oferta.php", datos, function (respuesta) {
-        if (respuesta.success) {
-            alert("Oferta actualizada correctamente.");
-            const modal = bootstrap.Modal.getInstance(document.getElementById("modalEditarOferta"));
-            modal.hide();
-            location.reload();
-        } else {
-            alert("Error al actualizar: " + respuesta.error);
-        }
+      if (respuesta.success) {
+        alert("Oferta actualizada correctamente.");
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalEditarOferta"));
+        modal.hide();
+        location.reload();
+      } else {
+        alert("Error al actualizar: " + respuesta.error);
+      }
     }, "json");
-});
-//
-$("#confirmar-eliminar-oferta").on("click", function () {
-  const id = $("#eliminar-id-oferta").val();
-
-  $.post("php/eliminar_oferta.php", { id: id }, function (respuesta) {
-    if (respuesta.success) {
-      alert("Oferta eliminada correctamente.");
-      const modal = bootstrap.Modal.getInstance(document.getElementById("modalEliminarOferta"));
-      modal.hide();
-      location.reload();
-    } else {
-      alert("Error al eliminar: " + respuesta.error);
-    }
-  }, "json");
-});
-/*filtros de ofertas*/
-function filtrarTabla() {
-  const filtroArticulo = $("#filtro-articulo").val().toLowerCase();
-  const filtroVariedad = $("#filtro-variedad").val().toLowerCase();
-  const filtroCultivo = $("#filtro-cultivo").val().toLowerCase();
-
-  $("#tabla-ofertas tbody tr").each(function () {
-    const articulo = $(this).find("td:eq(0)").text().toLowerCase();
-    const variedad = $(this).find("td:eq(1)").text().toLowerCase();
-    const cultivo = $(this).find("td:eq(2)").text().toLowerCase();
-
-    const coincide = articulo.includes(filtroArticulo)
-                  && variedad.includes(filtroVariedad)
-                  && cultivo.includes(filtroCultivo);
-
-    $(this).toggle(coincide);
   });
-}
-$("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", filtrarTabla);
-// AUTOCOMPLETE cultivo
-$("#cultivo").autocomplete({
-  source: function (request, response) {
-    $.ajax({
-      url: "php/buscar_cultivos.php",
-      dataType: "json",
-      data: { term: request.term },
-      success: function (data) {
-        response(data);
-      }
-    });
-  },
-  minLength: 1
-});
+  //
+  $("#confirmar-eliminar-oferta").on("click", function () {
+    const id = $("#eliminar-id-oferta").val();
 
-// AUTOCOMPLETE variedad * por hacer
-$("#variedad").autocomplete({
-  source: function (request, response) {
-    $.ajax({
-      url: "php/buscar_variedades.php",
-      dataType: "json",
-      data: { term: request.term },
-      success: function (data) {
-        response(data);
+    $.post("php/eliminar_oferta.php", { id: id }, function (respuesta) {
+      if (respuesta.success) {
+        alert("Oferta eliminada correctamente.");
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalEliminarOferta"));
+        modal.hide();
+        location.reload();
+      } else {
+        alert("Error al eliminar: " + respuesta.error);
       }
+    }, "json");
+  });
+  /*filtros de ofertas*/
+  function filtrarTabla() {
+    const filtroArticulo = $("#filtro-articulo").val().toLowerCase();
+    const filtroVariedad = $("#filtro-variedad").val().toLowerCase();
+    const filtroCultivo = $("#filtro-cultivo").val().toLowerCase();
+
+    $("#tabla-ofertas tbody tr").each(function () {
+      const articulo = $(this).find("td:eq(0)").text().toLowerCase();
+      const variedad = $(this).find("td:eq(1)").text().toLowerCase();
+      const cultivo = $(this).find("td:eq(2)").text().toLowerCase();
+
+      const coincide = articulo.includes(filtroArticulo)
+        && variedad.includes(filtroVariedad)
+        && cultivo.includes(filtroCultivo);
+
+      $(this).toggle(coincide);
     });
-  },
-  minLength: 1
-});
+  }
+  $("#filtro-articulo, #filtro-variedad, #filtro-cultivo").on("input", filtrarTabla);
+  // AUTOCOMPLETE cultivo
+  $("#cultivo").autocomplete({
+    source: function (request, response) {
+      $.ajax({
+        url: "php/buscar_cultivos.php",
+        dataType: "json",
+        data: { term: request.term },
+        success: function (data) {
+          response(data);
+        }
+      });
+    },
+    minLength: 1
+  });
+
+  // AUTOCOMPLETE variedad * por hacer
+  $("#variedad").autocomplete({
+    source: function (request, response) {
+      $.ajax({
+        url: "php/buscar_variedades.php",
+        dataType: "json",
+        data: { term: request.term },
+        success: function (data) {
+          response(data);
+        }
+      });
+    },
+    minLength: 1
+  });
 
 });//acabe ready
 //RESERVAS***************
@@ -365,6 +405,7 @@ $(document).on("click", ".btn-reservar", function () {
     if (respuesta.success) {
       alert("Reserva actualizada correctamente.");
       cargarOfertas(); //importante actualizar disponible/reservado
+
     } else {
       alert("Error al guardar la reserva: " + (respuesta.error || "desconocido."));
     }
@@ -373,10 +414,10 @@ $(document).on("click", ".btn-reservar", function () {
 
 
 // Cerrar sesión
-  $(document).on("click", "#cerrar-sesion", function (e) {
-    e.preventDefault();
-    window.location.href = "php/logout.php";
-  });
+$(document).on("click", "#cerrar-sesion", function (e) {
+  e.preventDefault();
+  window.location.href = "php/logout.php";
+});
 
 
 

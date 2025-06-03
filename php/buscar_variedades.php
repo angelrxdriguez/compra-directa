@@ -11,7 +11,8 @@ if ($conn->connect_error) {
 
 $termino = $_GET['term'] ?? '';
 
-$sql = "SELECT nombre FROM variedades WHERE nombre LIKE ? LIMIT 10";
+$sql = "SELECT nombre FROM variedades WHERE nombre LIKE ?";
+
 $stmt = $conn->prepare($sql);
 $likeTerm = "%$termino%";
 $stmt->bind_param("s", $likeTerm);

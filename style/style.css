@@ -7,11 +7,25 @@ body{
   font-style: normal !important;
   background-color: #FFFFE6 !important;
 }
+.logo{
+  filter: brightness(0) invert(1);
+}
+.navbar.navbar-expand-lg.navbar-light.bg-light.px-4{
+background: #908e34 !important;
+color: white !important;
+}
 .btn.btn-primary{
 background-color: #7a7617 !important;
 border: none;
 }
 .btn.btn-primary:hover{
+  background-color: #908C1C !important;
+}
+.btn-success{
+background-color: #7a7617 !important;
+border: none !important;
+}
+.btn-success:hover{
   background-color: #908C1C !important;
 }
 .tit-tabla{
@@ -22,15 +36,21 @@ border-radius: 30px;
 width: 350px;
 }
 /*BARRA DE NAVEGACION*/
+
 .nav-link {
-    color: black !important;
+    color: rgb(255, 255, 255) !important;
 }
 .nav-link.active {
-  border-bottom: #908C1C solid 2px !important;
+  border-bottom: #ffffff solid 2px !important;
 }
 .nav-link:hover {
-  color: #908C1C !important;
+  color: #e6e6e6 !important;
 }
+#nombre-usuario,
+#tipo-usuario {
+  text-transform: uppercase;
+}
+
 /*SESION*/
 .contenedor-sesion {
   display: flex;
@@ -113,4 +133,44 @@ th{
   color: white !important;
   text-align: center;
 }
+table#tabla-ofertas tr.sin-stock td:nth-child(6) {
+  background-color: #ff8b8b !important; 
+  font-weight: bold;
+  color: #000;
+}
+
+table#tabla-ofertas tr.poco-stock td:nth-child(6) {
+  background-color: #ffc175 !important;
+  font-weight: bold;
+  color: #000;
+}
+
+table#tabla-ofertas tr.ok-stock td:nth-child(6) {
+  /*background-color: #d4edda !important; */
+  color: #000;
+}
+.ui-autocomplete {
+  max-height: 200px;       
+  max-width: 300px !important;
+  overflow-y: auto;        /*scroll*/
+  overflow-x: hidden;     
+  z-index: 1000;           
+}
+
+
+.columna-disponible {
+  text-align: center;
+
+} 
+.disponible-cero {
+  border-radius: 25px;
+  font-weight: bold;
+}
+.disponible-bajo {
+  padding: 6px;
+  border-radius: 25px;
+}
+.disponible-ok {
+}
+/*comercial*/
   /*Adm-usuarios*/
