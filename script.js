@@ -89,19 +89,19 @@ $("#filtro-articulo").val(localStorage.getItem("filtro-articulo") || "");
 $("#filtro-variedad").val(localStorage.getItem("filtro-variedad") || "");
 $("#filtro-cultivo").val(localStorage.getItem("filtro-cultivo") || "");
 
-  $.get("php/sesion.php", function (datos) {
-    if (!datos.error) {
-      $("#nombre-usuario").text(datos.nombre);
-      $("#tipo-usuario").text(`${datos.tipo} ${datos.division}`);
-      tipoUsuario = datos.tipo;
-      cargarOfertas();  // llama a la función que carga las ofertas
-        if (!$("body").hasClass("modal-open")) {
-          cargarOfertas();
-        }
-    } else {
-      console.warn("No hay sesión activa");
-    }
-  }, "json");
+ $.get("php/sesion.php", function (datos) {
+  if (!datos.error) {
+    $("#nombre-usuario").text(datos.nombre);
+    $("#tipo-usuario").text(`${datos.tipo} ${datos.division}`);
+    tipoUsuario = datos.tipo;
+
+    // solo una llamada
+    cargarOfertas(); 
+  } else {
+    console.warn("No hay sesión activa");
+  }
+}, "json");
+
 
   $.get("php/obtener_usuarios.php", function (data) {
     data.forEach(function (usuario) {
@@ -412,6 +412,38 @@ function crearOferta() {
 }
 
 });//acabe ready
+//importar ofertas desde CSV
+document.getElementById("archivo_excel").addEventListener("change", function () {
+  const archivo = this.files[0];
+  if (!archivo) return;
+
+  // Solo habilitar el botón sin mostrar nada más
+  document.getElementById("btn-confirmar-importacion").disabled = false;
+});
+
+document.getElementById("form-importacion").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  fetch("php/procesar_csv_temp.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = "importar_revision.html";
+      } else {
+        alert("Error al procesar el archivo: " + data.error);
+      }
+    })
+    .catch(err => {
+      console.error("Error al importar:", err);
+      alert("Hubo un error al importar el archivo.");
+    });
+});
+
+
 //RESERVAS***************
 $(document).on("click", ".btn-reservar", function () {
   const btn = $(this);
@@ -441,6 +473,7 @@ $(document).on("click", "#cerrar-sesion", function (e) {
   e.preventDefault();
   window.location.href = "php/logout.php";
 });
+
 
 
 

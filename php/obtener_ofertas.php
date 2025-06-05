@@ -21,17 +21,24 @@ SELECT
     o.cultivo,
     o.fecha,
     o.cajas,
-    o.cajas - IFNULL(SUM(r2.cajas_reservadas), 0) AS disponible,
-    IFNULL(SUM(r2.cajas_reservadas), 0) AS reservado,
-    r1.cajas_reservadas AS mi_reserva
+    o.cajas - IFNULL(r_total.total_reservado, 0) AS disponible,
+    IFNULL(r_total.total_reservado, 0) AS reservado,
+    IFNULL(r_mias.cajas_reservadas, 0) AS mi_reserva
 FROM 
     ofertas o
-LEFT JOIN reservas r1 ON r1.id_oferta = o.id AND r1.id_usuario = ?
-LEFT JOIN reservas r2 ON r2.id_oferta = o.id
-GROUP BY o.id
+LEFT JOIN (
+    SELECT id_oferta, SUM(cajas_reservadas) AS total_reservado
+    FROM reservas
+    GROUP BY id_oferta
+) r_total ON r_total.id_oferta = o.id
+LEFT JOIN (
+    SELECT id_oferta, cajas_reservadas
+    FROM reservas
+    WHERE id_usuario = ?
+) r_mias ON r_mias.id_oferta = o.id
 ORDER BY o.id DESC
 ";
-//lo camnie el order de fecha a id
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
