@@ -257,10 +257,10 @@ $("#form-oferta").on("submit", function (e) {
     cultivoPendiente = !existeCultivo ? cultivo : "";
 
     if (!existeVariedad) faltantes.push(`la variedad <b>${variedad}</b>`);
-    if (!existeCultivo) faltantes.push(`el cultivo <b>${cultivo}</b>`);
+    if (!existeCultivo) faltantes.push(`del cultivo <b>${cultivo}</b>`);
 
     if (faltantes.length > 0) {
-      $("#mensaje-modal-registro").html(`${faltantes.join(" y ")} no están registrados. ¿Deseas registrarlos?`);
+      $("#mensaje-modal-registro").html(`${faltantes.join(",")} no están registrados. ¿Deseas registrarlos?`);
       new bootstrap.Modal(document.getElementById("modalConfirmarRegistro")).show();
     } else {
       crearOferta(); // Si todo existe, crear directamente

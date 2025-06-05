@@ -35,6 +35,9 @@ padding: 15px;
 border-radius: 30px;
 width: 310px;
 }
+.btn.btn-outline-success.mb-3{
+width: 100%;
+}
 /*BARRA DE NAVEGACION*/
 
 .nav-link {
@@ -50,7 +53,10 @@ width: 310px;
 #tipo-usuario {
   text-transform: uppercase;
 }
-
+.importar{
+  background-color: #908C1C !important;
+  margin-top: 200px !important;
+}
 /*SESION*/
 .contenedor-sesion {
   display: flex;

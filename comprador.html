@@ -71,12 +71,17 @@
                 <input type="number" step="0.5" min="0.5" class="form-control" id="cajas" name="cajas"
                     placeholder="Ej. 1.5">
             </div>
+
             <div class="col-md-2 d-grid">
                 <label class="form-label invisible">Añadir</label>
                 <button type="submit" class="btn btn-primary">Añadir</button>
             </div>
         </form>
+        <button class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#modalImportarCSV">
+  <i class="bi bi-upload me-1"></i> Importar Ofertas .CSV
+</button>
         <hr>
+
 <div class="row align-items-end mb-3">
   <div class="col-md-3">
     <div class="input-group">
@@ -209,7 +214,30 @@
     </div>
   </div>
 </div>
-
+  <div class="modal fade" id="modalImportarCSV" tabindex="-1" aria-labelledby="modalImportarCSVLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="php/importar_excel.php" method="post" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalImportarCSVLabel">Importar archivo de ofertas</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="archivo_excel" class="form-label">Selecciona un archivo CSV</label>
+            <input type="file" name="archivo_excel" id="archivo_excel" class="form-control" accept=".csv" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <small class="text-muted me-auto">Debe tener columnas: artículo, variedad, cultivo, fecha, cajas</small>
+        <small class="text-danger me-auto">Asegurate de que tenga formato .csv</small>
+          
+          <button type="submit" class="btn btn-success">Importar</button>          
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
         <style>
   .sin-stock {
     background-color: #f8d7da !important;

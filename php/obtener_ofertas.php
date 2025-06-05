@@ -29,9 +29,9 @@ FROM
 LEFT JOIN reservas r1 ON r1.id_oferta = o.id AND r1.id_usuario = ?
 LEFT JOIN reservas r2 ON r2.id_oferta = o.id
 GROUP BY o.id
-ORDER BY o.fecha DESC
+ORDER BY o.id DESC
 ";
-
+//lo camnie el order de fecha a id
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
