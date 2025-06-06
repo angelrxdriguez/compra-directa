@@ -155,8 +155,8 @@ ofertas.forEach(oferta => {
   const tr = document.createElement("tr");
   tr.setAttribute("data-id", oferta.id);
 
-  const claseVariedad = oferta.nueva_variedad ? "text-danger" : "";
-  const claseCultivo = oferta.nuevo_cultivo ? "text-danger" : "";
+  const claseVariedad = oferta.nueva_variedad ? "text-danger-nuevo" : "";
+  const claseCultivo = oferta.nuevo_cultivo ? "text-danger-nuevo" : "";
 
   const tooltipVariedad = oferta.nueva_variedad ? ' title="Nueva variedad"' : "";
   const tooltipCultivo = oferta.nuevo_cultivo ? ' title="Nuevo cultivo"' : "";

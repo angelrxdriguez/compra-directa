@@ -195,4 +195,8 @@ table#tabla-ofertas tr.ok-stock td:nth-child(6) {
   border-bottom-right-radius: 20px;
   padding: 5px;
 }
+.text-danger-nuevo{
+background-color: #ffd18b !important;
+}
+
   /*Adm-usuarios*/
