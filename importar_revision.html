@@ -256,7 +256,7 @@ document.getElementById("btn-confirmar-insercion").addEventListener("click", fun
     .then(data => {
       if (data.success) {
         alert("Las ofertas se han insertado correctamente.");
-        window.location.href = "oferta.html"; // O donde prefieras
+        window.location.href = "comprador.html"; 
       } else {
         alert("Error al insertar ofertas: " + (data.error || "desconocido."));
       }

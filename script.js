@@ -53,13 +53,46 @@ function formatearFecha(fechaStr) {
   if (partes.length !== 3) return fechaStr;
   return `${partes[2]}/${partes[1]}/${partes[0]}`; // dd/mm/yyyy
 }
+function ordenarTabla(columna, ascendente) {
+  const filas = $("#tabla-ofertas tbody tr").get();
+
+  filas.sort(function (a, b) {
+    let valA = $(a).find(`td:eq(${columna})`).text().toLowerCase();
+    let valB = $(b).find(`td:eq(${columna})`).text().toLowerCase();
+
+    if (columna === 3) { // Fecha
+      valA = new Date(valA);
+      valB = new Date(valB);
+    }
+
+    if (valA < valB) return ascendente ? -1 : 1;
+    if (valA > valB) return ascendente ? 1 : -1;
+    return 0;
+  });
+
+  $.each(filas, function (_, fila) {
+    $("#tabla-ofertas tbody").append(fila);
+  });
+
+  ordenActual = { columna, ascendente };
+}
 
 function cargarOfertas() {
-  $.get("php/obtener_ofertas.php", function (data) {
-    const $tbody = $("#tabla-ofertas tbody");
-    $tbody.empty();
+  const $tbody = $("#tabla-ofertas tbody");
 
+  // Guardar los filtros antes de borrar
+  const filtroArticulo = $("#filtro-articulo").val().toLowerCase();
+  const filtroVariedad = $("#filtro-variedad").val().toLowerCase();
+  const filtroCultivo = $("#filtro-cultivo").val().toLowerCase();
+
+  // Guardar orden actual (índice de columna y asc/desc)
+  const columnaOrden = ordenActual.columna;
+  const ascendente = ordenActual.ascendente;
+
+  $.get("php/obtener_ofertas.php", function (data) {
+    $tbody.empty();
     const fragmento = $(document.createDocumentFragment());
+
     data.forEach(function (oferta) {
       const fila = generarFilaOferta(oferta);
       fragmento.append(fila);
@@ -67,21 +100,24 @@ function cargarOfertas() {
 
     $tbody.append(fragmento);
 
-    filtrarTabla(); // aplicar los filtros tal como están en los inputs
+    // Restaurar filtros
+    $("#filtro-articulo").val(filtroArticulo);
+    $("#filtro-variedad").val(filtroVariedad);
+    $("#filtro-cultivo").val(filtroCultivo);
+    filtrarTabla();
+
+    // Restaurar orden
+    if (columnaOrden !== null) {
+      ordenarTabla(columnaOrden, ascendente);
+    }
   }, "json");
 }
 
 
-
-$("#btn-actualizar-ofertas").on("click", function () {
-  localStorage.setItem("filtro-articulo", $("#filtro-articulo").val());
-  localStorage.setItem("filtro-variedad", $("#filtro-variedad").val());
-  localStorage.setItem("filtro-cultivo", $("#filtro-cultivo").val());
-
-  cargarOfertas();
-});
-
-
+  let ordenActual = {
+    columna: null,
+    ascendente: true
+  };
 
 //READY EL DOM !!!!!!!!!!!!!!!!!!!
 $(document).ready(function () {
@@ -132,46 +168,13 @@ $("#filtro-cultivo").val(localStorage.getItem("filtro-cultivo") || "");
 
   //cargar oferrtas
 
-  let ordenAscendente = true;
 
-  let ordenActual = {
-    columna: null,
-    ascendente: true
-  };
+$(".ordenable").on("click", function () {
+  const columna = parseInt($(this).data("columna"));
+  const ascendente = (ordenActual.columna === columna) ? !ordenActual.ascendente : true;
+  ordenarTabla(columna, ascendente);
+});
 
-  $(".ordenable").on("click", function () {
-    const columna = parseInt($(this).data("columna"));
-
-    // Alternar orden si es la misma columna
-    if (ordenActual.columna === columna) {
-      ordenActual.ascendente = !ordenActual.ascendente;
-    } else {
-      ordenActual.columna = columna;
-      ordenActual.ascendente = true;
-    }
-
-    const filas = $("#tabla-ofertas tbody tr").get();
-
-    filas.sort(function (a, b) { //eq=columna
-      // obtiene el valor de la columna correspondiente
-      let valA = $(a).find(`td:eq(${columna})`).text().toLowerCase();
-      let valB = $(b).find(`td:eq(${columna})`).text().toLowerCase();
-
-      // compara si es indice tal ordena por tal
-      if (columna === 3) {
-        valA = new Date(valA);
-        valB = new Date(valB);
-      }
-
-      if (valA < valB) return ordenActual.ascendente ? -1 : 1;
-      if (valA > valB) return ordenActual.ascendente ? 1 : -1;
-      return 0;
-    });
-
-    $.each(filas, function (_, fila) {
-      $("#tabla-ofertas tbody").append(fila);
-    });
-  });
 
   $(document).on("click", ".btn-eliminar-oferta", function () {
     const id = $(this).data("id");
@@ -410,6 +413,11 @@ function crearOferta() {
     }
   }, "json");
 }
+setInterval(() => {
+  if (!estaInteraccionActiva()) {
+    cargarOfertas();
+  }
+}, 3000); // cada 10 segundos, ajustable
 
 });//acabe ready
 //importar ofertas desde CSV
@@ -466,6 +474,22 @@ $(document).on("click", ".btn-reservar", function () {
     }
   }, "json");
 });
+function estaInteraccionActiva() {
+  const hayModalAbierto = document.querySelectorAll(".modal.show").length > 0;
+  const elementoActivo = document.activeElement;
+  const esInputActivo = elementoActivo && (
+    elementoActivo.tagName === "INPUT" || elementoActivo.tagName === "TEXTAREA"
+  );
+
+  const hayFiltrosEscritos = (
+    $("#filtro-articulo").val().trim() !== "" ||
+    $("#filtro-variedad").val().trim() !== "" ||
+    $("#filtro-cultivo").val().trim() !== ""
+  );
+
+  return hayModalAbierto || esInputActivo || hayFiltrosEscritos;
+}
+
 
 
 // Cerrar sesión
