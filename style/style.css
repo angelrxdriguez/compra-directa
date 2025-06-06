@@ -179,4 +179,20 @@ table#tabla-ofertas tr.ok-stock td:nth-child(6) {
 .disponible-ok {
 }
 /*comercial*/
+.table-scroll-container {
+  max-height: 800px;
+  overflow-y: auto;
+  border: solid 2px #000000;
+  border-radius: 5px;
+}
+.tit-tabla2{
+  text-align: center;
+  background-color: #7a7617;
+  color: white;
+  width: 50%;
+  margin-left: 25%;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  padding: 5px;
+}
   /*Adm-usuarios*/

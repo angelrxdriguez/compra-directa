@@ -41,9 +41,15 @@
         </div>
     </nav>
 
-<h2 class="tit-tabla">Revisa La Importación</h2>
-       <div class="container mt-4">
-  <div class="table-responsive">
+<h2 class="tit-tabla2">Revisa La Importación</h2>
+
+<div class="container mt-4">
+    <div class="text-end">
+    <button class="btn btn-success" id="btn-confirmar-insercion">
+      <i class="bi bi-check-circle me-1"></i> Confirmar Inserción
+    </button>
+  </div>
+  <div class="table-responsive table-scroll-container">
     <table class="table table-striped" id="tabla-temp">
       <thead class="table-light">
         <tr>
@@ -60,12 +66,9 @@
       </tbody>
     </table>
   </div>
-  <div class="text-end">
-    <button class="btn btn-success" id="btn-confirmar-insercion">
-      <i class="bi bi-check-circle me-1"></i> Confirmar Inserción
-    </button>
-  </div>
+
 </div>
+
 
 <!-- Modal Editar Oferta Temporal -->
 <div class="modal fade" id="modalEditarTemporal" tabindex="-1" aria-labelledby="modalEditarTemporalLabel" aria-hidden="true">
@@ -148,29 +151,35 @@ document.addEventListener("DOMContentLoaded", function () {
       const tbody = document.querySelector("#tabla-temp tbody");
       tbody.innerHTML = ""; // Limpiar por si acaso
 
-      ofertas.forEach(oferta => {
-        const tr = document.createElement("tr");
-tr.setAttribute("data-id", oferta.id);
+ofertas.forEach(oferta => {
+  const tr = document.createElement("tr");
+  tr.setAttribute("data-id", oferta.id);
 
-tr.innerHTML = `
-  <td class="col-articulo">${oferta.articulo}</td>
-  <td class="col-variedad">${oferta.variedad}</td>
-  <td class="col-cultivo">${oferta.cultivo}</td>
-  <td class="col-fecha" data-raw="${oferta.fecha}">${formatearFecha(oferta.fecha)}</td>
-  <td class="col-cajas">${oferta.cajas}</td>
-  <td>
-    <button class="btn btn-sm btn-primary btn-editar-temporal" data-id="${oferta.id}">
-      <i class="bi bi-pencil"></i> Editar
-    </button>
-    <button class="btn btn-sm btn-danger btn-eliminar" data-id="${oferta.id}">
-      <i class="bi bi-trash"></i> Eliminar
-    </button>
-  </td>
-`;
+  const claseVariedad = oferta.nueva_variedad ? "text-danger" : "";
+  const claseCultivo = oferta.nuevo_cultivo ? "text-danger" : "";
 
+  const tooltipVariedad = oferta.nueva_variedad ? ' title="Nueva variedad"' : "";
+  const tooltipCultivo = oferta.nuevo_cultivo ? ' title="Nuevo cultivo"' : "";
 
-        tbody.appendChild(tr);
-      });
+  tr.innerHTML = `
+    <td class="col-articulo">${oferta.articulo}</td>
+    <td class="col-variedad ${claseVariedad}" ${tooltipVariedad}>${oferta.variedad}</td>
+    <td class="col-cultivo ${claseCultivo}" ${tooltipCultivo}>${oferta.cultivo}</td>
+    <td class="col-fecha" data-raw="${oferta.fecha}">${formatearFecha(oferta.fecha)}</td>
+    <td class="col-cajas">${oferta.cajas}</td>
+    <td>
+      <button class="btn btn-sm btn-primary btn-editar-temporal" data-id="${oferta.id}">
+        <i class="bi bi-pencil"></i> Editar
+      </button>
+      <button class="btn btn-sm btn-danger btn-eliminar" data-id="${oferta.id}">
+        <i class="bi bi-trash"></i> Eliminar
+      </button>
+    </td>
+  `;
+
+  tbody.appendChild(tr);
+});
+
     })
     .catch(err => {
       console.error("Error al cargar ofertas temporales:", err);
@@ -238,6 +247,26 @@ $("#btn-confirmar-eliminar-temp").on("click", function () {
       alert("Error al eliminar: " + (respuesta.error || "desconocido."));
     }
   }, "json");
+});
+document.getElementById("btn-confirmar-insercion").addEventListener("click", function () {
+  fetch("php/confirmar_importacion.php", {
+    method: "POST"
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Las ofertas se han insertado correctamente.");
+        window.location.href = "oferta.html"; // O donde prefieras
+      } else {
+        alert("Error al insertar ofertas: " + (data.error || "desconocido."));
+      }
+    })
+   .catch(async err => {
+  const responseText = await err.response?.text?.() ?? "Sin detalles";
+  console.error("Error:", err, "Respuesta del servidor:", responseText);
+  alert("Hubo un error al confirmar la inserción.\n" + responseText);
+});
+
 });
 
 
